@@ -79,3 +79,11 @@ void USART_ReadString(char* buffer, uint8_t maxLen) {
     }
     buffer[i] = '\0';  // Null-terminate
 }
+void ultra_trig(void){
+    PORTA.DIRSET = | 0b00000001;
+    PORTA.OUT =| 0b00000001;
+    _delay_us(10);
+    PORTA.OUT =& 0b11111110;
+    
+    
+}

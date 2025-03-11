@@ -14,15 +14,33 @@ int start(void){
 }
 
 int main(void) {
-   
     pwm_split_init();
+    static struct Pod pod1 = {0,0,0,0, (&TCA0.SPLIT.HCMP0), &TCA0.SPLIT.HCMP1, 0b00000010, 0b00000100, 0x07, &(PORTD.OUT)};
+    static struct Pod pod2 = {0,0,0,0, &TCA0.SPLIT.HCMP2, &TCA0.SPLIT.LCMP1, 0b00001000, 0b00010000, 0x10, &(PORTD.OUT)};
+    static struct Pod pod3 = {0,0,0,0, &TCA0.SPLIT.LCMP2, &TCA0.SPLIT.LCMP0, 0b00100000, 0b01000000, 0x11, &(PORTD.OUT)};
     struct Pod *p1, *p2, *p3;
-    innit_pods(&p1, &p2, &p3);  // Pass addresses of the pointers
-    simpleMovetoTarget(p1, 225, 20, 245);
-    simpleMovetoTarget(p2, 225, 20, 245);
-    simpleMovetoTarget(p3, 225, 20, 245);
+    p1 = &pod1;
+    p2 = &pod2;
+    p3 = &pod3;
+
+    simpleMovetoTarget(p1, 0, 255, 0);
+   simpleMovetoTarget(p2, 0, 255, 0);
+    simpleMovetoTarget(p3, 0, 255, 0);
+   
+    int i = 0;
+    
+    
+    
    
     while (1){
+        i++;
+        if (i>255){
+            i = 0;
+        }
+       //simpleMovetoTarget(p1, 245, i, 245);
+      //  simpleMovetoTarget(p2, 245, i, 245);
+      // simpleMovetoTarget(p3, 245, i, 245);
+        _delay_us(100000);
     }
 }
 int recive_and_ecexucte_command(struct Pod **podn) {

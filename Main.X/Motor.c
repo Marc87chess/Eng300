@@ -41,6 +41,8 @@ int innit_pods(struct Pod **p1, struct Pod **p2, struct Pod **p3) {
     *p3 = &pod3;
 
     simpleMovetoTarget(*p1, 10, 5, 245);
+    simpleMovetoTarget(*p2, 10, 5, 245);
+    simpleMovetoTarget(*p3, 10, 5, 245);
     return 0;
 }
 void pwm_split_init(void){
