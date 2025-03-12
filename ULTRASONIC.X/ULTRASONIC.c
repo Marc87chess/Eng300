@@ -1,16 +1,8 @@
-/*
- * File:   newavr-main.c
- * Author: i-no-like-crappy-os
- *
- * Created on March 8, 2025, 6:59 PM
- */
-
-
-
 /// DISTANCE CENSORT CODE
 #include <avr/io.h>
 #include <util/delay.h>
 #include <avr/interrupt.h>
+#define CLKSCALE 4
 uint16_t value[5] = {0};
 uint8_t count = 0;
 uint8_t duty = 250;
@@ -26,28 +18,33 @@ void ultra_trig(void){
 }
 
 int main(void) {
-    
-     PORTA.DIRSET |= 0b00000101;
+     //CCP = 0xd8;
+     //CLKCTRL.OSCHFCTRLA = 0b00011100;
+     PORTA.DIRSET |= 0b00001101;
      PORTA.DIRSET &= 0b11111101;
      EVSYS.CHANNEL0 = 0x41;
-     EVSYS.USERTCB2CAPT = 0x01;//PA1
-     TCB2.INTCTRL = 0x01;
-     TCB2.EVCTRL = 0x01;
-     TCB2.CTRLB = 0x04;
-     TCB2.CTRLA = 0x01;
+     EVSYS.USERTCB2CAPT = 0x01;//PA1 0x02 would be PA2
+     TCB2.INTCTRL = 0x01; // CAPTURE INPUT ENABLE
+     TCB2.EVCTRL = 0x01; // ENABLE CAPTURE INPUT EVENT ASWELL?
+     TCB2.CTRLB = 0x04;// pulse width mode 0x03 for frequncy
+     TCB2.CTRLA = 0x01;// ENABLE THE  TCB TIMER AS A WHOLE
      sei();
-     
+     double dist = 0;
     while (1) {
         
        ultra_trig();
        
        _delay_us(2000);
-       
+       dist =  (((value[0]*(1/CLKSCALE))*0.0343)/2); //cm
        if (value[0] >= 2000){
             PORTA.OUT |= 0b00000100;
             
        }
-       else PORTA.OUT &= 0b11111011;
+       if (dist >= 8.75){
+            PORTA.OUT |= 0b0001000;
+            
+       }
+       else PORTA.OUT &= 0b11110011;
     }
 }
 ISR(TCB2_INT_vect){
