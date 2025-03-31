@@ -18,6 +18,7 @@
                    displayName="Source Files"
                    projectFiles="true">
       <itemPath>newavr-main.c</itemPath>
+      <itemPath>newavr-main1.c</itemPath>
     </logicalFolder>
   </logicalFolder>
   <projectmakefile>Makefile</projectmakefile>

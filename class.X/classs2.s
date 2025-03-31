@@ -1,4 +1,4 @@
-    .data
+/*    .data
 a: .byte 2
 b: .byte 2
 c: .byte 3
@@ -39,5 +39,5 @@ main:
     
     sts c, r24
     nop
-    
+*/   
     

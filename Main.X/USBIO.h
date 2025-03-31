@@ -13,6 +13,8 @@
 #define	XC_HEADER_TEMPLATE_H
 #endif 
 #define F_CPU 16000000UL
+#define MAX_BUFFER_SIZE 100
+#define ASCIICON 48
 #include <xc.h> // include processor files - each processor file is guarded.  
 
 // TODO Insert appropriate #include <>
@@ -48,14 +50,20 @@ int adc_init(uint8_t pos);
 
 int DAC_init(void);
 
+
 uint16_t ADC_read();
 
 void DAC0_setVal(uint16_t value);
 
+
+int receive_until_null(char * buffer);
+
+uint16_t ADC_readpos(uint8_t pos);
+int16_t USART_Receive_Timeout(uint16_t timeout);
 void USART_Init(uint16_t baud);
 
-void USART_Transmit(uint8_t data);
+void USART_Transmit(uint16_t data);
 
-uint8_t USART_Receive(void);
+uint16_t USART_Receive(void);
 
-void USART_ReadString(char* buffer, uint8_t maxLen);
+

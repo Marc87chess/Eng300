@@ -63,6 +63,9 @@ struct Pod {
     
     uint8_t* port_registerdir;
 };
+
+int zerospeed(struct Pod * pod1, struct Pod * pod2,struct Pod * pod3);
+
 int innit_pins(void);
 
 void pwm_init(void);
@@ -75,4 +78,8 @@ void pwm_split_init(void);
 
 int MovetoTarget(struct Pod * podn, int Target,int speed);
 
-int simpleMovetoTarget(struct Pod * podn, int Target,int speed,int head);
+int simpleMovetoTarget(struct Pod * podn, int Target,int speed,int mode);
+
+int TESTMOVE(struct Pod * podn, int Target,int speed,int head);
+
+int innit_pod(struct Pod **p1, struct Pod **p2, struct Pod **p3);

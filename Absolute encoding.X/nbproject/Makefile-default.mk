@@ -51,17 +51,17 @@ OBJECTDIR=build/${CND_CONF}/${IMAGE_TYPE}
 DISTDIR=dist/${CND_CONF}/${IMAGE_TYPE}
 
 # Source Files Quoted if spaced
-SOURCEFILES_QUOTED_IF_SPACED=newavr-main.c
+SOURCEFILES_QUOTED_IF_SPACED=newavr-main.c newavr-main1.c
 
 # Object Files Quoted if spaced
-OBJECTFILES_QUOTED_IF_SPACED=${OBJECTDIR}/newavr-main.o
-POSSIBLE_DEPFILES=${OBJECTDIR}/newavr-main.o.d
+OBJECTFILES_QUOTED_IF_SPACED=${OBJECTDIR}/newavr-main.o ${OBJECTDIR}/newavr-main1.o
+POSSIBLE_DEPFILES=${OBJECTDIR}/newavr-main.o.d ${OBJECTDIR}/newavr-main1.o.d
 
 # Object Files
-OBJECTFILES=${OBJECTDIR}/newavr-main.o
+OBJECTFILES=${OBJECTDIR}/newavr-main.o ${OBJECTDIR}/newavr-main1.o
 
 # Source Files
-SOURCEFILES=newavr-main.c
+SOURCEFILES=newavr-main.c newavr-main1.c
 
 
 
@@ -94,12 +94,24 @@ ${OBJECTDIR}/newavr-main.o: newavr-main.c  .generated_files/flags/default/f9f7ce
 	@${RM} ${OBJECTDIR}/newavr-main.o 
 	${MP_CC} $(MP_EXTRA_CC_PRE) -mcpu=$(MP_PROCESSOR_OPTION) -c  -D__DEBUG=1 -g -DDEBUG  -gdwarf-2  -x c -D__$(MP_PROCESSOR_OPTION)__   -mdfp="${DFP_DIR}/xc8"  -Wl,--gc-sections -O1 -ffunction-sections -fdata-sections -fshort-enums -fno-common -funsigned-char -funsigned-bitfields -Wall -DXPRJ_default=$(CND_CONF)  $(COMPARISON_BUILD)  -gdwarf-3 -mconst-data-in-progmem -mconst-data-in-config-mapped-progmem     -MD -MP -MF "${OBJECTDIR}/newavr-main.o.d" -MT "${OBJECTDIR}/newavr-main.o.d" -MT ${OBJECTDIR}/newavr-main.o -o ${OBJECTDIR}/newavr-main.o newavr-main.c 
 	
+${OBJECTDIR}/newavr-main1.o: newavr-main1.c  .generated_files/flags/default/c18082a95730df3ffe65275b7c0aa2604b15c973 .generated_files/flags/default/da39a3ee5e6b4b0d3255bfef95601890afd80709
+	@${MKDIR} "${OBJECTDIR}" 
+	@${RM} ${OBJECTDIR}/newavr-main1.o.d 
+	@${RM} ${OBJECTDIR}/newavr-main1.o 
+	${MP_CC} $(MP_EXTRA_CC_PRE) -mcpu=$(MP_PROCESSOR_OPTION) -c  -D__DEBUG=1 -g -DDEBUG  -gdwarf-2  -x c -D__$(MP_PROCESSOR_OPTION)__   -mdfp="${DFP_DIR}/xc8"  -Wl,--gc-sections -O1 -ffunction-sections -fdata-sections -fshort-enums -fno-common -funsigned-char -funsigned-bitfields -Wall -DXPRJ_default=$(CND_CONF)  $(COMPARISON_BUILD)  -gdwarf-3 -mconst-data-in-progmem -mconst-data-in-config-mapped-progmem     -MD -MP -MF "${OBJECTDIR}/newavr-main1.o.d" -MT "${OBJECTDIR}/newavr-main1.o.d" -MT ${OBJECTDIR}/newavr-main1.o -o ${OBJECTDIR}/newavr-main1.o newavr-main1.c 
+	
 else
 ${OBJECTDIR}/newavr-main.o: newavr-main.c  .generated_files/flags/default/51cb5182bd513f69ca989da9a41088e560620559 .generated_files/flags/default/da39a3ee5e6b4b0d3255bfef95601890afd80709
 	@${MKDIR} "${OBJECTDIR}" 
 	@${RM} ${OBJECTDIR}/newavr-main.o.d 
 	@${RM} ${OBJECTDIR}/newavr-main.o 
 	${MP_CC} $(MP_EXTRA_CC_PRE) -mcpu=$(MP_PROCESSOR_OPTION) -c  -x c -D__$(MP_PROCESSOR_OPTION)__   -mdfp="${DFP_DIR}/xc8"  -Wl,--gc-sections -O1 -ffunction-sections -fdata-sections -fshort-enums -fno-common -funsigned-char -funsigned-bitfields -Wall -DXPRJ_default=$(CND_CONF)  $(COMPARISON_BUILD)  -gdwarf-3 -mconst-data-in-progmem -mconst-data-in-config-mapped-progmem     -MD -MP -MF "${OBJECTDIR}/newavr-main.o.d" -MT "${OBJECTDIR}/newavr-main.o.d" -MT ${OBJECTDIR}/newavr-main.o -o ${OBJECTDIR}/newavr-main.o newavr-main.c 
+	
+${OBJECTDIR}/newavr-main1.o: newavr-main1.c  .generated_files/flags/default/482f31cb8811c9bdae8f30ee5bdb6e3503de608c .generated_files/flags/default/da39a3ee5e6b4b0d3255bfef95601890afd80709
+	@${MKDIR} "${OBJECTDIR}" 
+	@${RM} ${OBJECTDIR}/newavr-main1.o.d 
+	@${RM} ${OBJECTDIR}/newavr-main1.o 
+	${MP_CC} $(MP_EXTRA_CC_PRE) -mcpu=$(MP_PROCESSOR_OPTION) -c  -x c -D__$(MP_PROCESSOR_OPTION)__   -mdfp="${DFP_DIR}/xc8"  -Wl,--gc-sections -O1 -ffunction-sections -fdata-sections -fshort-enums -fno-common -funsigned-char -funsigned-bitfields -Wall -DXPRJ_default=$(CND_CONF)  $(COMPARISON_BUILD)  -gdwarf-3 -mconst-data-in-progmem -mconst-data-in-config-mapped-progmem     -MD -MP -MF "${OBJECTDIR}/newavr-main1.o.d" -MT "${OBJECTDIR}/newavr-main1.o.d" -MT ${OBJECTDIR}/newavr-main1.o -o ${OBJECTDIR}/newavr-main1.o newavr-main1.c 
 	
 endif
 

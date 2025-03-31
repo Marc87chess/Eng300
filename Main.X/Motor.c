@@ -6,7 +6,9 @@
 #define PWM_PIN PIN0_bm  
 #define PERIOD_US 1000  // 1 kHz PWM = 1000 µs period
 #define DUTY_CYCLE 50 
-#define PER_VALUE = 255
+#define PER_VALUE 255
+#define FASTTURN 8.0
+#define FASTDRIVE 8.0
 
 #define PWM_PIN (1 << PIN0)  // CHANGE THIS
 
@@ -31,19 +33,17 @@ int innit_pins(void){
 
 // Timer0 compare interrupt service routine
 
-int innit_pods(struct Pod **p1, struct Pod **p2, struct Pod **p3) {
-    static struct Pod pod1 = {0,0,0,0, (&TCA0.SPLIT.HCMP0), &TCA0.SPLIT.HCMP1, 0b00000010, 0b00000100, 0x07, &(PORTD.OUT)};
-    static struct Pod pod2 = {0,0,0,0, &TCA0.SPLIT.HCMP2, &TCA0.SPLIT.LCMP1, 0b00001000, 0b00010000, 0x10, &(PORTD.OUT)};
-    static struct Pod pod3 = {0,0,0,0, &TCA0.SPLIT.LCMP2, &TCA0.SPLIT.LCMP0, 0b00100000, 0b01000000, 0x11, &(PORTD.OUT)};
+int innit_pod(struct Pod **p1, struct Pod **p2, struct Pod **p3) {
+    static struct Pod pod1 = {0,0,0,0, (&TCA0.SPLIT.HCMP2), &TCA0.SPLIT.LCMP1, 0b00000010, 0b00010000, 0x07, &(PORTD.OUT)};
+    static struct Pod pod2 = {0,0,0,0, &TCA0.SPLIT.HCMP0, &TCA0.SPLIT.HCMP1,0b01000000, 0b00100000, 0x10, &(PORTD.OUT)};
+    static struct Pod pod3 = {0,0,0,0, &TCA0.SPLIT.HCMP0, &TCA0.SPLIT.LCMP0, 0b01000000, 0b00000100, 0x11, &(PORTD.OUT)};
     
     *p1 = &pod1;
     *p2 = &pod2;
     *p3 = &pod3;
 
-    simpleMovetoTarget(*p1, 10, 5, 245);
-    simpleMovetoTarget(*p2, 10, 5, 245);
-    simpleMovetoTarget(*p3, 10, 5, 245);
-    return 0;
+  
+    return 0 ;
 }
 void pwm_split_init(void){
     // 1. Ensure full-speed clock (Remove prescaler if needed)
@@ -63,12 +63,12 @@ void pwm_split_init(void){
     TCA0.SPLIT.HPER = 255;  // Upper 8-bit timer period
 
     // 6. Set duty cycles for all compare channels
-    TCA0.SPLIT.LCMP0 = 128;  // 50% duty cycle on PA0
-    TCA0.SPLIT.LCMP1 = 64;   // 25% duty cycle on PA1
-    TCA0.SPLIT.LCMP2 = 192;  // 75% duty cycle on PA2
-    TCA0.SPLIT.HCMP0 = 32;   // 12.5% duty cycle on PA3
-    TCA0.SPLIT.HCMP1 = 160;  // 62.5% duty cycle on PA4
-    TCA0.SPLIT.HCMP2 = 224;  // 87.5% duty cycle on PA5
+    TCA0.SPLIT.LCMP0 = 0;  // 50% duty cycle on PA0
+    TCA0.SPLIT.LCMP1 = 0;   // 25% duty cycle on PA1
+    TCA0.SPLIT.LCMP2 = 0;  // 75% duty cycle on PA2
+    TCA0.SPLIT.HCMP0 = 0;   // 12.5% duty cycle on PA3
+    TCA0.SPLIT.HCMP1 = 0;  // 62.5% duty cycle on PA4
+    TCA0.SPLIT.HCMP2 = 0;  // 87.5% duty cycle on PA5
 
     // 7. Enable all compare channels (LCMP0, LCMP1, LCMP2, HCMP0, HCMP1, HCMP2)
     TCA0.SPLIT.CTRLB = 
@@ -84,17 +84,33 @@ void pwm_split_init(void){
 }
  
 int MovetoTarget(struct Pod * podn, int Target,int speed){
-    ADC0.MUXPOS = (podn->pos);
+    static int prev_error = 0;  // Store previous error
+    const float Kd = 0;      
+   
     
-    uint16_t head = ADC_read();
+    int head = ADC_read();
+    head = head/16;
     //top motor spins direction = 1 and bottom = 0 for "forward"
+    int error;
     
-    Target = Target - head;
+    
+    error = Target - head; //max value is 255
+   
+    
+   
+    int D = (Kd * (error - prev_error));
+    prev_error = error;
+
+   
+    Target = error;
+
+    
     //Turn rate of swerve m1 + m2
     //move rate of swerve = m1 - m2
     int mtop = (Target + speed)/2;
     int mbottom = (Target - speed)/2;
-    *(podn->port_registerdir) = (*(podn->port_registerdir) & 0b11111000);
+    *(podn->port_registerdir) &= ~(podn->adirtop);
+    *(podn->port_registerdir) &= ~(podn->adirbottom);
     if (mtop < 0){
         mtop = -1*mtop;
         *(podn->port_registerdir) = *(podn->port_registerdir) |(podn->adirtop);
@@ -113,18 +129,23 @@ int MovetoTarget(struct Pod * podn, int Target,int speed){
     if (Target == 0) return 1;
     return 0;
 }
-int simpleMovetoTarget(struct Pod * podn, int Target,int speed,int head){
-    //ADC0.MUXPOS = (podn->pos);
-    
-    //uint16_t head = ADC_read();
-    //top motor spins direction = 1 and bottom = 0 for "forward"
-    
-    Target = Target - head;
+int simpleMovetoTarget(struct Pod * podn, int Target,int speed,int mode){
+
+   
     //Turn rate of swerve m1 + m2
     //move rate of swerve = m1 - m2
-    int mtop = (Target + speed)/2;
-    int mbottom = (Target - speed)/2;
-    *(podn->port_registerdir) = (*(podn->port_registerdir) & 0b11111000);
+    int mtop;
+    int mbottom;
+    if (mode){
+        mtop = ((Target*(FASTTURN/10.0)) + (speed*((10-FASTTURN)/10.0)));
+        mbottom =((Target*(FASTTURN/-10.0)) + (speed*((10-FASTTURN)/10.0)));
+    }
+    else{
+        mtop = ((Target*((10-FASTDRIVE)/10.0)) + (speed*(FASTDRIVE/10.0)));
+        mbottom =((Target*((10-FASTDRIVE)/-10.0)) + (speed*(FASTDRIVE/10.0)));
+    }
+    *(podn->port_registerdir) &= ~(podn->adirtop);
+    *(podn->port_registerdir) &= ~(podn->adirbottom);
     if (mtop < 0){
         mtop = -1*mtop;
         *(podn->port_registerdir) = *(podn->port_registerdir) |(podn->adirtop);
@@ -142,6 +163,42 @@ int simpleMovetoTarget(struct Pod * podn, int Target,int speed,int head){
     *(podn->pwm2) = mbottom;
     if (Target == 0) return 1;
     return 0;
+}
+int TESTMOVE(struct Pod * podn, int Target,int speed,int head){
+ 
+    Target = Target - head;
+
+    int mtop = -255;//(Target + speed)/2;
+    int mbottom = -255; //(Target - speed)/2;
+    *(podn->port_registerdir) &= ~(podn->adirtop);
+    *(podn->port_registerdir) &= ~(podn->adirbottom);
+    if (mtop < 0){
+        mtop = -1*mtop;
+        *(podn->port_registerdir) = *(podn->port_registerdir) |(podn->adirtop);
+    }else podn->dirtop = 0;
+    if (mbottom < 0){
+        mbottom = -1*mbottom;
+        *(podn->port_registerdir) =  *(podn->port_registerdir) | (podn->adirbottom);
+    }else podn->dirbottom = 0;
+    
+   
+    
+    
+   
+    *(podn->pwm1) = mtop;
+    *(podn->pwm2) = mbottom;
+    if (Target == 0) return 1;
+    return 0;
+}
+int zerospeed(struct Pod * pod1, struct Pod * pod2,struct Pod * pod3){
+    *(pod1->pwm1) = 0;
+    *(pod1->pwm2) = 0;
+    *(pod2->pwm1) = 0;
+    *(pod2->pwm2) = 0;
+    *(pod3->pwm1) = 0;
+    *(pod3->pwm2) = 0;
+    return 0;
+    
 }
 
 

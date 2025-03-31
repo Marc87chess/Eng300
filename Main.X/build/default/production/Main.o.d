@@ -20,7 +20,7 @@ build/default/production/Main.o.d build/default/production/Main.o: Main.c \
  c:\program\ files\microchip\xc8\v3.00\avr\avr\include\avr\fuse.h \
  c:\program\ files\microchip\xc8\v3.00\avr\avr\include\avr\lock.h \
  c:\program\ files\microchip\xc8\v3.00\avr\avr\include\avr\builtins.h \
- Motor.h
+ Motor.h LEDM.h
 
 USBIO.h:
 
@@ -65,3 +65,5 @@ c:\program\ files\microchip\xc8\v3.00\avr\avr\include\avr\lock.h:
 c:\program\ files\microchip\xc8\v3.00\avr\avr\include\avr\builtins.h:
 
 Motor.h:
+
+LEDM.h:

@@ -23,7 +23,20 @@ int DAC_init(void){ // soon will add non hard coded port
                  | DAC_RUNSTDBY_bm;       /* Enable Run in Standby mode */
     return 0;
 }
+uint16_t ADC_readpos(uint8_t pos) {
+    // Start ADC conversion
+    ADC0.MUXPOS = pos;
+    ADC0.COMMAND = ADC_STCONV_bm;
 
+    // Wait for conversion to complete
+    while (!(ADC0.INTFLAGS & ADC_RESRDY_bm));
+
+    // Clear the interrupt flag
+    ADC0.INTFLAGS = ADC_RESRDY_bm;
+
+    // Return the result
+    return ADC0.RES;
+}
 uint16_t ADC_read() {
     // Start ADC conversion
     ADC0.COMMAND = ADC_STCONV_bm;
@@ -47,7 +60,7 @@ void DAC0_setVal(uint16_t value)
 void USART_Init(uint16_t baud) {
     // Set baud rate
     //USART1.BAUD = 0000010011100010;
-    USART1.BAUD = 1700;
+    USART1.BAUD = 6666;
     // Set frame format: 8-bit, no parity, 1 stop bit (8N1)
     USART1.CTRLC = USART_CMODE_ASYNCHRONOUS_gc | USART_PMODE_DISABLED_gc | USART_CHSIZE_8BIT_gc;
     
@@ -60,30 +73,49 @@ void USART_Init(uint16_t baud) {
 }
 
 // Function to send a byte
-void USART_Transmit(uint8_t data) {
+void USART_Transmit(uint16_t data) {
     while (!(USART1.STATUS & USART_DREIF_bm));  // Wait until buffer is empty
     USART1.TXDATAL = data;  // Send data
 }
 
 // Function to receive a byte
-uint8_t USART_Receive(void) {
+uint16_t USART_Receive(void) {
     while (!(USART1.STATUS & USART_RXCIF_bm));  // Wait for data
     return USART1.RXDATAL;  // Return received byte
 }
-void USART_ReadString(char* buffer, uint8_t maxLen) {
-    uint8_t i = 0;
-    while (i < (maxLen - 1)) {
-        buffer[i] = USART_Receive();
-        if (buffer[i] == '\n') break;
-        i++;
+int16_t USART_Receive_Timeout(uint16_t timeout) {
+    while (!(USART1.STATUS & USART_RXCIF_bm)) {
+        if (timeout-- == 0) return -1;  // Timeout reached
     }
-    buffer[i] = '\0';  // Null-terminate
+    return USART1.RXDATAL;
 }
-void ultra_trig(void){
-    PORTA.DIRSET = | 0b00000001;
-    PORTA.OUT =| 0b00000001;
-    _delay_us(10);
-    PORTA.OUT =& 0b11111110;
-    
-    
+int receive_until_null(char * buffer) {
+    char received_char;
+      // Array to store received characters
+    uint8_t index = 0;  // Index to keep track of the current position in the buffer
+
+    while (1) {
+        received_char = USART_Receive();  // Read a byte
+         if (received_char == -1) {
+            return -1;  
+        }
+        if (received_char == 0) {
+            break;  // Exit the loop when NULL (end of string) is encountered
+        }
+
+        // Append received character to buffer
+        if (index < MAX_BUFFER_SIZE - 1) {  // Make sure we don't overflow the buffer
+            buffer[index++] = received_char;
+        } else {
+            // Buffer overflow handling (if necessary)
+            // Optionally, you could print an error or handle it differently
+            break;
+        }
+    }
+
+   
+    buffer[index] = '\0';
+    return 0;
+
+  
 }
